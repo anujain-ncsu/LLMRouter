@@ -1,0 +1,39 @@
+# .coderabbit.yaml - Configuration for Direct Main Branch Analysis
+version: "1.0"
+
+reviews:
+  # This ensures CodeRabbit looks at your code even without a PR
+  analyze_all_commits: true
+  
+  # High-level summary of the changes in the commit
+  summary:
+    enabled: true
+    
+  # Detailed line-by-line feedback
+  tools:
+    github-review:
+      enabled: true
+      # This will post feedback as comments on the specific commit
+      post_comment_on_commit: true 
+
+  # Choose your level of "noise"
+  profile: "chill" # Options: "chill", "assertive", or "comprehensive"
+
+# Since you're merging to main, you might want to skip certain files
+# (e.g., documentation or configuration files) to keep the review focused.
+include:
+  - "**/*.{js,ts,py,go,rb,java,cpp,c,h,rs}" # Add your project's specific extensions
+
+exclude:
+  - "dist/**"
+  - "build/**"
+  - "node_modules/**"
+  - "*.md"
+
+# Instructions for the AI to understand your specific style
+instructions: |
+  I often push directly to the main branch. Please focus on:
+  1. Critical bugs or security vulnerabilities.
+  2. Performance regressions.
+  3. Logic errors that might break production.
+  Keep suggestions concise as they will be viewed in the commit history.
