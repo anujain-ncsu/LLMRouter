@@ -122,7 +122,7 @@
     // ── Response Rendering ─────────────────────────────────────────────
     function showResponse(data) {
         dom.responseArea.hidden = false;
-        dom.errorArea.hidden = true;
+        dom.errorArea.classList.remove('visible');
 
         dom.responseModelInfo.innerHTML = `
             <span class="response-model-name">${data.model_name}</span>
@@ -162,7 +162,7 @@
     }
 
     function showError(message) {
-        dom.errorArea.hidden = false;
+        dom.errorArea.classList.add('visible');
         dom.responseArea.hidden = true;
         dom.errorMessage.textContent = message;
     }
@@ -273,7 +273,7 @@
         dom.sendBtn.disabled = true;
         dom.sendBtnText.hidden = true;
         dom.sendBtnLoader.hidden = false;
-        dom.errorArea.hidden = true;
+        dom.errorArea.classList.remove('visible');
         dom.responseArea.hidden = true;
 
         try {
