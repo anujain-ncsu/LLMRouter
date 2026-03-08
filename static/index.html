@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NexusAI Router — Intelligent LLM routing platform with auto-model-selection and fault tolerance.">
+    <title>NexusAI Router</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background mesh -->
+    <div class="bg-mesh"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">◆</span>
+                <h1>NexusAI Router</h1>
+            </div>
+            <span class="header-badge">v1.0</span>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <label for="user-id-input">User</label>
+                <input type="text" id="user-id-input" value="user-1" placeholder="user-id" maxlength="128">
+            </div>
+            <button id="health-btn" class="icon-btn" title="System Health">
+                <span class="status-dot" id="health-dot"></span>
+                Health
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Left: Chat Area -->
+        <section class="chat-section" id="chat-section">
+            <!-- Model Selector -->
+            <div class="model-selector" id="model-selector">
+                <div class="selector-header">
+                    <h2>Select Model</h2>
+                    <div class="auto-select-toggle">
+                        <label class="toggle-label" for="auto-select-toggle">
+                            <input type="checkbox" id="auto-select-toggle" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Auto-select</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="model-cards" id="model-cards">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Prompt Input -->
+            <div class="prompt-area glass-card" id="prompt-area">
+                <textarea
+                    id="prompt-input"
+                    placeholder="Ask anything... Type a code question, analytical problem, or casual chat."
+                    rows="4"
+                    maxlength="10000"
+                ></textarea>
+                <div class="prompt-footer">
+                    <span class="char-count" id="char-count">0 / 10,000</span>
+                    <button id="send-btn" class="send-btn">
+                        <span class="send-btn-text">Send</span>
+                        <span class="send-btn-loader" hidden>
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Response Area -->
+            <div class="response-area glass-card" id="response-area" hidden>
+                <div class="response-header">
+                    <div class="response-model" id="response-model-info">
+                        <!-- model name + badge -->
+                    </div>
+                    <div class="response-meta" id="response-meta">
+                        <!-- tokens, latency, cost -->
+                    </div>
+                </div>
+                <div class="response-body" id="response-body">
+                    <!-- response text -->
+                </div>
+                <div class="response-recommendation" id="response-recommendation" hidden>
+                    <!-- auto-select reasoning -->
+                </div>
+            </div>
+
+            <!-- Error Display -->
+            <div class="error-area glass-card error" id="error-area" hidden>
+                <span class="error-icon">⚠</span>
+                <span id="error-message"></span>
+            </div>
+        </section>
+
+        <!-- Right: Usage Sidebar -->
+        <aside class="sidebar glass-card" id="sidebar">
+            <h2>Session Usage</h2>
+            <div class="usage-summary" id="usage-summary">
+                <div class="usage-stat">
+                    <span class="usage-label">Total Requests</span>
+                    <span class="usage-value" id="usage-requests">0</span>
+                </div>
+                <div class="usage-stat">
+                    <span class="usage-label">System Tokens</span>
+                    <span class="usage-value" id="usage-system-tokens">0</span>
+                </div>
+                <div class="usage-stat">
+                    <span class="usage-label">Model Tokens</span>
+                    <span class="usage-value" id="usage-model-tokens">0</span>
+                </div>
+            </div>
+            <h3>Per Model</h3>
+            <div class="usage-per-model" id="usage-per-model">
+                <p class="no-data">No usage yet</p>
+            </div>
+
+            <h3>System Health</h3>
+            <div class="health-panel" id="health-panel">
+                <!-- Populated by JS -->
+            </div>
+        </aside>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Health Modal -->
+    <div class="modal-overlay" id="health-modal" hidden>
+        <div class="modal glass-card">
+            <div class="modal-header">
+                <h2>System Health</h2>
+                <button class="modal-close" id="health-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="health-modal-body">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
