@@ -58,6 +58,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from mock_backends.server import app as mock_app
+app.mount("/mock", mock_app)
+
 # CORS for development
 app.add_middleware(
     CORSMiddleware,

@@ -32,19 +32,11 @@ def run_main_server():
 
 
 if __name__ == "__main__":
-    # Start mock backend in a separate process
-    backend_process = multiprocessing.Process(target=run_mock_backend, daemon=True)
-    backend_process.start()
-
-    # Give the backend a moment to start
-    time.sleep(1)
-    print("✓ Mock LLM backends started on port 8100")
     print("✓ Starting NexusAI Router on http://localhost:8000")
+    print("✓ Mock LLM backends are mounted at /mock")
     print()
 
     try:
         run_main_server()
     except KeyboardInterrupt:
         print("\nShutting down...")
-        backend_process.terminate()
-        backend_process.join()

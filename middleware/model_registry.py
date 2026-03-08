@@ -15,7 +15,7 @@ _DEFAULT_MODELS: list[ModelInfo] = [
         id="novamind-7b",
         name="NovaMind 7B",
         description="Versatile general-purpose model. Good balance of speed and quality.",
-        endpoint_url="http://127.0.0.1:8100/models/novamind-7b/generate",
+        endpoint_url=f"http://127.0.0.1:{__import__('os').environ.get('PORT', 8000)}/mock/models/novamind-7b/generate",
         cost_ratio=2.0,  # Cheap: 1 system token = 2 model tokens
         capabilities=[ModelCapability.GENERAL, ModelCapability.FAST],
         max_tokens=4096,
@@ -25,7 +25,7 @@ _DEFAULT_MODELS: list[ModelInfo] = [
         id="quantumleap-13b",
         name="QuantumLeap 13B",
         description="Excels at reasoning, analysis, and complex question answering.",
-        endpoint_url="http://127.0.0.1:8100/models/quantumleap-13b/generate",
+        endpoint_url=f"http://127.0.0.1:{__import__('os').environ.get('PORT', 8000)}/mock/models/quantumleap-13b/generate",
         cost_ratio=1.0,  # Standard: 1 system token = 1 model token
         capabilities=[ModelCapability.REASONING, ModelCapability.ANALYSIS],
         max_tokens=8192,
@@ -35,7 +35,7 @@ _DEFAULT_MODELS: list[ModelInfo] = [
         id="stellarcode-70b",
         name="StellarCode 70B",
         description="Premium model for code generation, debugging, and technical tasks.",
-        endpoint_url="http://127.0.0.1:8100/models/stellarcode-70b/generate",
+        endpoint_url=f"http://127.0.0.1:{__import__('os').environ.get('PORT', 8000)}/mock/models/stellarcode-70b/generate",
         cost_ratio=0.5,  # Expensive: 1 system token = 0.5 model tokens
         capabilities=[ModelCapability.CODE, ModelCapability.COMPLEX],
         max_tokens=8192,
@@ -45,7 +45,7 @@ _DEFAULT_MODELS: list[ModelInfo] = [
         id="nebulachat-3b",
         name="NebulaChat 3B",
         description="Lightweight model for casual conversation and simple queries.",
-        endpoint_url="http://127.0.0.1:8100/models/nebulachat-3b/generate",
+        endpoint_url=f"http://127.0.0.1:{__import__('os').environ.get('PORT', 8000)}/mock/models/nebulachat-3b/generate",
         cost_ratio=3.0,  # Very cheap: 1 system token = 3 model tokens
         capabilities=[ModelCapability.CHAT, ModelCapability.CASUAL],
         max_tokens=2048,
