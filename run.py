@@ -20,11 +20,13 @@ def run_mock_backend():
 
 
 def run_main_server():
-    """Run the main API server on port 8000."""
+    """Run the main API server on port 8000 (or $PORT)."""
+    import os
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(
         "server.app:app",
         host="0.0.0.0",
-        port=8000,
+        port=port,
         log_level="info",
     )
 
