@@ -20,7 +20,7 @@
     const dom = {
         userIdInput: document.getElementById('user-id-input'),
         autoSelectToggle: document.getElementById('auto-select-toggle'),
-        modelCards: document.getElementById('model-cards'),
+        modelSelect: document.getElementById('model-select'),
         promptInput: document.getElementById('prompt-input'),
         charCount: document.getElementById('char-count'),
         sendBtn: document.getElementById('send-btn'),
@@ -98,49 +98,25 @@
         }, 4000);
     }
 
-    // ── Model Cards ────────────────────────────────────────────────────
-    function getCostLabel(costRatio) {
-        if (costRatio >= 3.0) return '💰 Very Cheap';
-        if (costRatio >= 2.0) return '💰 Cheap';
-        if (costRatio >= 1.0) return '💰💰 Standard';
-        return '💰💰💰 Premium';
-    }
-
-    function renderModelCards() {
-        dom.modelCards.innerHTML = '';
+    // ── Model Dropdown ────────────────────────────────────────────────
+    function renderModelDropdown() {
+        dom.modelSelect.innerHTML = '';
         state.models.forEach(model => {
-            const card = document.createElement('div');
-            card.className = 'model-card';
-            card.dataset.modelId = model.id;
-
-            if (!model.available) card.classList.add('disabled');
-            if (state.autoSelect) card.classList.add('auto-mode');
-            if (model.id === state.selectedModelId && !state.autoSelect) {
-                card.classList.add('selected');
+            const opt = document.createElement('option');
+            opt.value = model.id;
+            opt.textContent = model.name;
+            if (!model.available) {
+                opt.disabled = true;
+                opt.textContent += ' (unavailable)';
             }
-
-            card.innerHTML = `
-                <div class="model-card-header">
-                    <span class="model-card-name">${model.name}</span>
-                    <span class="model-card-status ${model.available ? '' : 'unavailable'}"></span>
-                </div>
-                <div class="model-card-desc">${model.description}</div>
-                <div class="model-card-footer">
-                    <span class="model-card-cost">${getCostLabel(model.cost_ratio)}</span>
-                    <div class="model-card-tags">
-                        ${model.capabilities.slice(0, 2).map(c => `<span class="model-tag">${c}</span>`).join('')}
-                    </div>
-                </div>
-            `;
-
-            card.addEventListener('click', () => {
-                if (state.autoSelect || !model.available) return;
-                state.selectedModelId = model.id;
-                renderModelCards();
-            });
-
-            dom.modelCards.appendChild(card);
+            dom.modelSelect.appendChild(opt);
         });
+
+        // Sync dropdown state with auto-select toggle
+        dom.modelSelect.disabled = state.autoSelect;
+        if (!state.autoSelect && state.selectedModelId) {
+            dom.modelSelect.value = state.selectedModelId;
+        }
     }
 
     // ── Response Rendering ─────────────────────────────────────────────
@@ -227,21 +203,26 @@
     }
 
     // ── Health Rendering ───────────────────────────────────────────────
+    const STATE_LABELS = { closed: 'operational', open: 'blocked', half_open: 'degraded' };
+
     async function refreshHealth() {
         try {
             const health = await API.fetchHealth();
             const anyDown = health.models.some(m => !m.available);
             dom.healthDot.className = 'status-dot' + (anyDown ? ' degraded' : '');
 
-            dom.healthPanel.innerHTML = health.models.map(m => `
+            dom.healthPanel.innerHTML = health.models.map(m => {
+                const label = STATE_LABELS[m.circuit_state] || m.circuit_state;
+                return `
                 <div class="health-item">
                     <span class="health-item-name">${m.model_name}</span>
-                    <span class="health-item-state ${m.circuit_state}">
+                    <span class="health-item-state ${label}">
                         <span class="model-card-status ${m.available ? '' : 'unavailable'}"></span>
-                        ${m.circuit_state}
+                        ${label}
                     </span>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         } catch (e) {
             dom.healthDot.className = 'status-dot unhealthy';
         }
@@ -249,15 +230,18 @@
 
     function showHealthModal() {
         API.fetchHealth().then(health => {
-            dom.healthModalBody.innerHTML = health.models.map(m => `
+            dom.healthModalBody.innerHTML = health.models.map(m => {
+                const label = STATE_LABELS[m.circuit_state] || m.circuit_state;
+                return `
                 <div class="health-modal-model">
                     <h3>${m.model_name}</h3>
-                    <div class="health-modal-row"><span>State</span><span class="health-item-state ${m.circuit_state}">${m.circuit_state}</span></div>
+                    <div class="health-modal-row"><span>State</span><span class="health-item-state ${label}">${label}</span></div>
                     <div class="health-modal-row"><span>Available</span><span>${m.available ? '✅' : '❌'}</span></div>
                     <div class="health-modal-row"><span>Failure Rate</span><span>${(m.failure_rate * 100).toFixed(1)}%</span></div>
                     ${m.cooloff_remaining_seconds ? `<div class="health-modal-row"><span>Cooloff Remaining</span><span>${m.cooloff_remaining_seconds}s</span></div>` : ''}
                 </div>
-            `).join('') + `
+            `;
+            }).join('') + `
                 <div class="health-modal-model">
                     <h3>System</h3>
                     <div class="health-modal-row"><span>Status</span><span>${health.status}</span></div>
@@ -265,7 +249,7 @@
                     <div class="health-modal-row"><span>Uptime</span><span>${health.uptime_seconds.toFixed(0)}s</span></div>
                 </div>
             `;
-            dom.healthModal.hidden = false;
+            dom.healthModal.classList.add('active');
         }).catch(() => showToast('Failed to load health data', 'error'));
     }
 
@@ -313,12 +297,15 @@
     // ── Event Listeners ────────────────────────────────────────────────
     dom.autoSelectToggle.addEventListener('change', (e) => {
         state.autoSelect = e.target.checked;
-        if (state.autoSelect) {
-            state.selectedModelId = null;
-        } else if (state.models.length && !state.selectedModelId) {
+        dom.modelSelect.disabled = state.autoSelect;
+        if (!state.autoSelect && state.models.length && !state.selectedModelId) {
             state.selectedModelId = state.models[0].id;
+            dom.modelSelect.value = state.selectedModelId;
         }
-        renderModelCards();
+    });
+
+    dom.modelSelect.addEventListener('change', (e) => {
+        state.selectedModelId = e.target.value;
     });
 
     dom.promptInput.addEventListener('input', () => {
@@ -335,16 +322,16 @@
     });
 
     dom.healthBtn.addEventListener('click', showHealthModal);
-    dom.healthModalClose.addEventListener('click', () => { dom.healthModal.hidden = true; });
+    dom.healthModalClose.addEventListener('click', () => { dom.healthModal.classList.remove('active'); });
     dom.healthModal.addEventListener('click', (e) => {
-        if (e.target === dom.healthModal) dom.healthModal.hidden = true;
+        if (e.target === dom.healthModal) dom.healthModal.classList.remove('active');
     });
 
     // ── Initialization ─────────────────────────────────────────────────
     async function init() {
         try {
             state.models = await API.fetchModels();
-            renderModelCards();
+            renderModelDropdown();
             await refreshHealth();
             await refreshUsage();
         } catch (e) {
